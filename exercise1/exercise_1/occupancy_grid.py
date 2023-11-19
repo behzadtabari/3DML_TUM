@@ -13,14 +13,16 @@ def occupancy_grid(sdf_function, resolution):
     """
 
     # ###############
+    x_coord = np.linspace(-0.5, 0.5, num=resolution)
+    y_coord = np.linspace(-0.5, 0.5, num=resolution)
+    z_coord = np.linspace(-0.5, 0.5, num=resolution)
+    
+    x, y, z = np.meshgrid(x_coord, y_coord, z_coord, indexing='ij')
 
-    # Set the center and range for each dimension
-    grid = np.linspace(-0.5, 0.5, num=resolution)
-    xx, yy, zz = np.meshgrid(grid, grid, grid, indexing='ij')
-
-    sdf_values = sdf_function(xx.flatten(), yy.flatten(), zz.flatten())
-    sdf_values = (sdf_values <= 0).astype(int)
-    occ_grid = sdf_values.reshape(resolution, resolution, resolution)
-
-    return occ_grid
+    sdf_grid = sdf_function(x.flatten(), y.flatten(), z.flatten())
+    sdf_grid = sdf_grid.reshape((resolution, resolution, resolution))
+    
+    occupancy_grid = np.where(sdf_grid < 0, 1, 0)
+    
+    return occupancy_grid
     # ###############

@@ -149,8 +149,12 @@ def compute_cube_index(cube: np.array, isolevel=0.) -> int:
     """
 
     # ###############
-    # TODO: Implement
-    raise NotImplementedError
+    cube_index = 0
+    for i in range(8):
+        if cube[i] < isolevel:
+            cube_index += 2**i
+
+    return cube_index
     # ###############
 
 
@@ -165,12 +169,11 @@ def marching_cubes(sdf: np.array) -> tuple:
     """
 
     # ###############
-    # TODO: Implement
-    raise NotImplementedError
+    return
     # ###############
 
 
-def vertex_interpolation(p_1, p_2, v_1, v_2, isovalue=0.):
+def vertex_interpolation(p_1, p_2, v_1, v_2, isovalue=0.0):
     """
     Calculate the vertex location between corner points p_1 and p_2
     :param p_1: Corner point 1
@@ -180,4 +183,6 @@ def vertex_interpolation(p_1, p_2, v_1, v_2, isovalue=0.):
     :param isovalue: The iso value, always 0 in our case
     :return: A single point
     """
-    return p_1 + (p_2 - p_1) / 2.
+    # p_1 + (p_2 - p_1) / 2.0
+    return p_1 + (isovalue - v_1) * (p_2 - p_1) / (v_2 - v_1)
+

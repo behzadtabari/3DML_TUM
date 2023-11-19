@@ -15,14 +15,9 @@ def signed_distance_sphere(x, y, z, r, x_0, y_0, z_0):
     :return: signed distance from the surface of the sphere
     """
     # ###############
-    # TODO: raise errors for when radius is zero or lesser than zero
-
-    # TODO: raise an error where the coordinates are not real numbers
-
-    # calculate signed distance
-    signed_distance = np.sqrt((x - x_0) ** 2 + (y - y_0) ** 2 + (z - z_0) ** 2) - r
-
-    return signed_distance
+    dist_to_center = np.sqrt(np.square(x-x_0)+np.square(y-y_0)+np.square(z-z_0))
+    signed_dist = dist_to_center - r
+    return signed_dist
     # ###############
 
 
@@ -40,12 +35,9 @@ def signed_distance_torus(x, y, z, R, r, x_0, y_0, z_0):
     :return: signed distance from the surface of the torus
     """
     # ###############
-    # TODO: raise errors when radii are zero or lesser than zero
-
-    # TODO: raise an error where the coordinates are not real numbers
-    signed_distance = np.sqrt( (np.sqrt((x-x_0)**2 + (z-z_0)**2 ) - R)**2+ (y-y_0)**2) - r
-
-    return signed_distance
+    a = np.sqrt(np.square(x-x_0)+np.square(z-z_0))-R
+    signed_dist = np.sqrt(np.square(y-y_0)+np.square(a))-r
+    return signed_dist
     # ###############
 
 
@@ -64,19 +56,16 @@ def signed_distance_atom(x, y, z):
     electron_center = (orbit_radius, 0, 0)
     electron_radius = 0.05
     # ###############
-    # TODO: raise an error when the numbers are not real
-
-    # signed distance of proton assuming it is a sphere
-    signed_distance_proton = signed_distance_sphere(x,y,z,proton_radius,proton_center[0],proton_center[1],proton_center[2])
-
-    # signed distance of electron assuming it is a sphere
-    signed_distance_electron = signed_distance_sphere(x,y,z,electron_radius,electron_center[0],electron_center[1],electron_center[2])
-
-    # signed distance of orbit assuming it is a torus
-    # Assuming the center of proton is the centre of orbit
-    signed_distance_orbit = signed_distance_torus(x,y,z,orbit_radius,orbit_thickness,proton_center[0],proton_center[1],proton_center[2])
-
-    # To calculate the SDF we should use the Union operation Union: min 𝑓𝑖(𝑥)
-    signed_distance = np.minimum.reduce([signed_distance_proton, signed_distance_orbit, signed_distance_electron])
-
-    return signed_distance
+    proton_signed_dist = np.square(x-proton_center[0])+np.square(y-proton_center[1])+np.square(z-proton_center[2])
+    proton_signed_dist = np.sqrt(proton_signed_dist)-proton_radius
+    
+    electron_signed_dist = np.square(x-electron_center[0])+np.square(y-electron_center[1])+np.square(z-electron_center[2])
+    electron_signed_dist = np.sqrt(electron_signed_dist)-electron_radius
+    
+    a = np.sqrt(np.square(x-proton_center[0])+np.square(z-proton_center[2]))-orbit_radius
+    orbit_signed_dist = np.sqrt(np.square(y-proton_center[1])+np.square(a))-orbit_thickness
+    
+    all_signed_dist = np.stack((proton_signed_dist,electron_signed_dist,orbit_signed_dist))
+    signed_dist = np.amin(all_signed_dist, axis=0)
+    return signed_dist
+    # ###############
