@@ -169,7 +169,53 @@ def marching_cubes(sdf: np.array) -> tuple:
     """
 
     # ###############
-    return
+    EdgeIndices = np.array([[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]])
+    
+    CornerIndices = np.array([[0, 0, 0], [1, 0, 0], [1, 1, 0], [0, 1, 0],
+                        [0, 0, 1], [1, 0, 1], [1, 1, 1], [0, 1, 1]])
+    
+    # Create an array for all cubes
+    resolution = sdf.shape[0]
+    xx, yy, zz = np.meshgrid(range(resolution-1), range(resolution-1), range(resolution-1))
+    CubeArray = np.stack((xx,yy,zz))                        
+    CubeArray = CubeArray.transpose(0, 2, 1, 3).reshape(3, -1).T
+    
+    Faces_Array = []
+    Vertices_Array = []
+    
+    for i, cube in enumerate(CubeArray):
+        # compute cube index
+        sdf_idx = (cube + CornerIndices).T
+        x_val = sdf_idx[0]
+        y_val = sdf_idx[1]
+        z_val = sdf_idx[2]
+        sdf_values = sdf[x_val, y_val, z_val]
+        cube_index = compute_cube_index(sdf_values)
+        
+        # Compute vertex locations for each vertex defined in the triangle_table
+        vertices = []
+        for edge_idx in range(12):
+            if edge_idx in triangle_table[cube_index]:
+                p_1 = CornerIndices[EdgeIndices[edge_idx][0]]
+                p_2 = CornerIndices[EdgeIndices[edge_idx][1]] 
+                v_1 = sdf[((cube + p_1).T)[0], ((cube + p_1).T)[1], ((cube + p_1).T)[2]]
+                v_2 = sdf[((cube + p_2).T)[0], ((cube + p_2).T)[1], ((cube + p_2).T)[2]]
+                interpolated_vertex = cube + vertex_interpolation(p_1=p_1, p_2=p_2, v_1=v_1, v_2=v_2)
+                vertices.append(interpolated_vertex)
+            else:
+                vertices.append(None)
+                
+        triangle_idx = np.array(triangle_table[cube_index])
+        triangle_list = triangle_idx[triangle_idx > -1].reshape(-1, 3)
+        
+        num_vertices = len(Vertices_Array)
+        for j, triangle in enumerate(triangle_list):
+            Faces_Array.append(np.array([num_vertices * 3 + j * 3 + 0,
+                                         num_vertices * 3 + j * 3 + 1,
+                                         num_vertices * 3 + j * 3 + 2]))
+            Vertices_Array.append(np.array([vertices[triangle[0]], vertices[triangle[1]], vertices[triangle[2]]]))
+    
+    return np.concatenate(Vertices_Array), np.stack(Faces_Array)
     # ###############
 
 
