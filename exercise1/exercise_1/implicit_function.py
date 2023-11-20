@@ -43,6 +43,8 @@ def signed_distance_torus(x, y, z, R, r, x_0, y_0, z_0):
     # TODO: raise errors when radii are zero or lesser than zero
 
     # TODO: raise an error where the coordinates are not real numbers
+
+    # TODO: raise an error when r>R is
     signed_distance = np.sqrt( (np.sqrt((x-x_0)**2 + (z-z_0)**2 ) - R)**2+ (y-y_0)**2) - r
 
     return signed_distance

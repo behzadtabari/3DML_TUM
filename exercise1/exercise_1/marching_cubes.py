@@ -149,8 +149,18 @@ def compute_cube_index(cube: np.array, isolevel=0.) -> int:
     """
 
     # ###############
-    # TODO: Implement
-    raise NotImplementedError
+    # TODO: an error must be raised when cube is not an array of 8 digits of integers or it is outside -1 ,0 or 1
+
+    result = 0
+    for i in range(len(cube)):
+        if cube[i] > isolevel:
+            j = 0
+        else:
+            j = 1
+        result = result + j*(2**i)
+
+    return result
+
     # ###############
 
 
@@ -165,8 +175,51 @@ def marching_cubes(sdf: np.array) -> tuple:
     """
 
     # ###############
-    # TODO: Implement
-    raise NotImplementedError
+    faces = []
+    vertices = []
+    vertices_index = 0
+    corner_dict = \
+        {0:[0, 1], 1: [1, 2], 2:[3, 2], 3:[0, 3], 4:[4, 5], 5:[5, 6],
+        6:[7, 6], 7:[4, 7], 8:[0, 4], 9:[1, 5], 10:[2, 6], 11:[3, 7]}
+    # Offsets that needs to be added to the corners for exact location
+    corner_location_offsets = np.array(
+        [[0, 0, 0], [1, 0, 0], [1, 1, 0], [0, 1, 0], [0, 0, 1], [1, 0, 1], [1, 1, 1], [0, 1, 1]])
+    for k in range(len(sdf)-1)    :
+        for j in range(len(sdf)-1) :
+            for i in range(len(sdf)-1) :
+                base = [i, j, k]
+
+                dummy_cube = np.array([sdf[i,j,k],sdf[i+1,j,k],sdf[i+1,j+1,k],sdf[i,j+1,k]
+                                    ,sdf[i,j,k+1],sdf[i+1,j,k+1],sdf[i+1,j+1,k+1],sdf[i,j+1,k+1]])
+                dummy_computed_cube_index = compute_cube_index(dummy_cube)
+                #list_of_cubes.append(dummy_cube)
+                #list_of_computed_cubes.append(dummy_computed_cube)
+                # from the triangle table
+                triangle_edges = np.reshape(triangle_table[dummy_computed_cube_index], (-1, 3))
+                # Remove -1 rows because they are irrelevant.
+                triangle_edges = triangle_edges[~np.all(triangle_edges == -1, axis=1)]
+
+                for triangle_edge in triangle_edges:
+                    face = []
+                    for p in range(3):
+                        points = corner_dict[triangle_edge[p]]
+                        corner_one = base + corner_location_offsets[points[0]]
+                        corner_two = base + corner_location_offsets[points[1]]
+
+                        vertex = vertex_interpolation(corner_one,corner_two,
+                                                      sdf[corner_one[0],corner_one[1],corner_one[2]],
+                                                       sdf[corner_two[0],corner_two[1],corner_two[2]])
+
+                        vertices.append(vertex)
+                        face.append(vertices_index)
+                        vertices_index += 1
+                    faces.append(face)
+
+    vertices = np.array(vertices).reshape(-1, 3, 3)
+    faces = np.array(faces)
+    # ###############
+
+    return vertices, faces
     # ###############
 
 
@@ -180,4 +233,6 @@ def vertex_interpolation(p_1, p_2, v_1, v_2, isovalue=0.):
     :param isovalue: The iso value, always 0 in our case
     :return: A single point
     """
-    return p_1 + (p_2 - p_1) / 2.
+    #assuming linear interpolation
+    mu = (isovalue - v_1) / (v_2 - v_1)
+    return p_1 + mu * (p_2 - p_1)

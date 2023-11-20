@@ -13,7 +13,7 @@ def occupancy_grid(sdf_function, resolution):
     """
 
     # ###############
-
+    # TODO: raise an error when resolution zero or lesser than zero is
     # Set the center and range for each dimension
     grid = np.linspace(-0.5, 0.5, num=resolution)
     xx, yy, zz = np.meshgrid(grid, grid, grid, indexing='ij')
