@@ -14,8 +14,16 @@ def export_mesh_to_obj(path, vertices, faces):
     # write faces starting with "f "
 
     # ###############
-    # TODO: Implement
-    raise NotImplementedError
+    with open(path, "w") as obj_file:
+        # Write vertex data
+        for vertex in vertices:
+            formatted_vertex = "v " + " ".join("{:.6f}".format(coord) for coord in vertex)
+            obj_file.write(formatted_vertex + "\n")
+
+        # Write face data
+        for face in faces:
+            obj_file.write("f " + " ".join(map(str, [i + 1 for i in face])) + "\n")
+
     # ###############
 
 
@@ -26,8 +34,12 @@ def export_pointcloud_to_obj(path, pointcloud):
     :param pointcloud: Nx3 points
     :return: None
     """
+    with open(path, "w") as obj_file:
+        # Write vertex data
+        for vertex in pointcloud:
+            formatted_vertex = "v " + " ".join("{:.6f}".format(coord) for coord in vertex)
+            obj_file.write(formatted_vertex + "\n")
 
     # ###############
-    # TODO: Implement
-    raise NotImplementedError
+
     # ###############

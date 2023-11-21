@@ -215,7 +215,7 @@ def marching_cubes(sdf: np.array) -> tuple:
                         vertices_index += 1
                     faces.append(face)
 
-    vertices = np.array(vertices).reshape(-1, 3, 3)
+    vertices = np.array(vertices)
     faces = np.array(faces)
     # ###############
 
