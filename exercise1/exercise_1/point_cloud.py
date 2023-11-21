@@ -17,6 +17,7 @@ def sample_point_cloud(vertices, faces, n_points):
         vertex_one = vertices[face[0]]
         vertex_two = vertices[face[1]]
         vertex_three = vertices[face[2]]
+
         v1 = np.array([vertex_two[0]-vertex_one[0],vertex_two[1]-vertex_one[1],vertex_two[2]-vertex_one[2]])
         v2 = np.array([vertex_three[0]-vertex_one[0], vertex_three[1]-vertex_one[1],vertex_three[2]-vertex_one[2]])
 
@@ -39,10 +40,13 @@ def sample_point_cloud(vertices, faces, n_points):
         B = vertices[face[1]]
         C = vertices[face[2]]
 
+        # create the random numbers based on the probability of each face
         num_of_points = selected_points[i]
-        r1 = np.random.uniform(0,1,num_of_points)
-        r2 = np.random.uniform(0,1,num_of_points)
+        r1 = np.random.rand(num_of_points)
+        r2 = np.random.rand(num_of_points)
 
+        # barycentric formula , u = 1 - sqrt(r1) , v = sqrt(r1)*(1-r2) , w = sqrt(r1)*r2
+        # P = u*A + v*B + w*C
         u = 1 - np.sqrt(r1)
         v = (np.sqrt(r1))*(1-r2)
         w = np.sqrt(r1)*r2

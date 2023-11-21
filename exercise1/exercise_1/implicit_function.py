@@ -15,9 +15,9 @@ def signed_distance_sphere(x, y, z, r, x_0, y_0, z_0):
     :return: signed distance from the surface of the sphere
     """
     # ###############
-    # TODO: raise errors for when radius is zero or lesser than zero
-
-    # TODO: raise an error where the coordinates are not real numbers
+    # raise errors for when radius is zero or lesser than zero
+    if r <= 0:
+        raise ValueError(" radius (r) must be greater than 0")
 
     # calculate signed distance
     signed_distance = np.sqrt((x - x_0) ** 2 + (y - y_0) ** 2 + (z - z_0) ** 2) - r
@@ -40,13 +40,17 @@ def signed_distance_torus(x, y, z, R, r, x_0, y_0, z_0):
     :return: signed distance from the surface of the torus
     """
     # ###############
-    # TODO: raise errors when radii are zero or lesser than zero
+    # raise errors for when radius is zero or lesser than zero
+    if r <= 0:
+        raise ValueError(" radius (r) must be greater than 0")
+    # raise error when minor radius is greater than major radius
+    if R - r <= 0:
+        raise ValueError("Minor radius (r) must be less than the major radius (R).")
 
-    # TODO: raise an error where the coordinates are not real numbers
-
-    # TODO: raise an error when r>R is
     signed_distance = np.sqrt( (np.sqrt((x-x_0)**2 + (z-z_0)**2 ) - R)**2+ (y-y_0)**2) - r
 
+    # Use np.isclose to set very small values to zero
+    signed_distance = np.where(np.isclose(signed_distance, 0), 0, signed_distance)
     return signed_distance
     # ###############
 
@@ -66,7 +70,7 @@ def signed_distance_atom(x, y, z):
     electron_center = (orbit_radius, 0, 0)
     electron_radius = 0.05
     # ###############
-    # TODO: raise an error when the numbers are not real
+
 
     # signed distance of proton assuming it is a sphere
     signed_distance_proton = signed_distance_sphere(x,y,z,proton_radius,proton_center[0],proton_center[1],proton_center[2])

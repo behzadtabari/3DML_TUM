@@ -149,7 +149,7 @@ def compute_cube_index(cube: np.array, isolevel=0.) -> int:
     """
 
     # ###############
-    # TODO: an error must be raised when cube is not an array of 8 digits of integers or it is outside -1 ,0 or 1
+
 
     result = 0
     for i in range(len(cube)):
