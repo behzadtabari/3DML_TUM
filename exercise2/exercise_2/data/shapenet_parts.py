@@ -54,7 +54,7 @@ class ShapeNetParts(torch.utils.data.Dataset):
         point_cloud = np.loadtxt(point_path).astype(np.float32).T
         
         # downsample pointcloud to 1024 points
-        random_indices = np.random.choice(point_cloud.shape[1], size=1024, replace=False)
+        random_indices = np.random.choice(point_cloud.shape[1], size=1024, replace=True)
         point_cloud = point_cloud[:, random_indices]
         
         # get segmentation labels
