@@ -67,11 +67,13 @@ def train(model, trainloader, valloader, device, config):
                     with torch.no_grad():
                         # Get prediction scores
                         prediction = model(batch_val['points'])
+                        current_batch_size = prediction.size(0)
 
                     # Get predicted labels from scores
                     _, predicted_labels = torch.max(prediction, dim=1)
 
                     # keep track of total / correct / loss_total_val
+                    batch['label'] = batch['label'][:current_batch_size]
                     total += predicted_labels.shape[0]
                     correct += (predicted_labels == batch_val['label']).sum().item()
 
